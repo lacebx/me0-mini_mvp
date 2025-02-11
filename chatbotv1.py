@@ -7,7 +7,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from flask import Flask, request, jsonify
 import pdfplumber
 from docx import Document
-
+import re 
 
 
 # Load curated data
@@ -48,7 +48,7 @@ def construct_prompt(query, retrieved_docs):
 # Define response generation
 def generate_response(prompt):
     inputs = tokenizer(prompt, return_tensors="pt")
-    outputs = model.generate(inputs.input_ids, max_length=2000, num_return_sequences=1, no_repeat_ngram_size=2, early_stopping=True)  # Changed num_beams to num_return_sequences
+    outputs = model.generate(inputs.input_ids, max_length=100, num_return_sequences=1, no_repeat_ngram_size=2, early_stopping=True)  # Changed num_beams to num_return_sequences
     return tokenizer.decode(outputs[0], skip_special_tokens=True)
 
 # Define chatbot response function
@@ -77,14 +77,14 @@ def chatbot_response(query):
         "can you explain": "I can explain complex topics in simple terms. Please let me know what you'd like me to explain, and I'll do my best to break it down for you."
     }
     
-    # Normalize the query for easier matching
+     # Normalize the query for easier matching
     normalized_query = query.lower().strip()
     
-    # Check if the query matches a casual response
-    if normalized_query in casual_responses:
-        return casual_responses[normalized_query]
+    # Check for greetings using a regex (matches "hi", "hello", etc.)
+    if re.search(r'\b(hi|hello|hey)\b', normalized_query):
+        return casual_responses["greeting"]
     
-    # If not casual, proceed to retrieve documents
+    # Proceed to retrieve documents and generate response if not a casual query
     retrieved_docs = retrieve_documents(query, embedder, index)
     prompt = construct_prompt(query, retrieved_docs)
     return generate_response(prompt)
