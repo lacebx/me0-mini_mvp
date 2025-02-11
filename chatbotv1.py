@@ -29,6 +29,11 @@ model_name = "EleutherAI/gpt-neo-125M"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(model_name)
 
+# Pre-warm the model
+model.eval()  # Set the model to evaluation mode
+dummy_input = tokenizer("dummy input", return_tensors="pt")  # Create a dummy input
+_ = model.generate(dummy_input.input_ids)  # Run dummy inference
+
 # Define retrieval function
 def retrieve_documents(query, embedder, index, k=3):
     query_embedding = embedder.encode([query], convert_to_numpy=True)
@@ -43,7 +48,7 @@ def construct_prompt(query, retrieved_docs):
 # Define response generation
 def generate_response(prompt):
     inputs = tokenizer(prompt, return_tensors="pt")
-    outputs = model.generate(inputs.input_ids, max_length=2000, num_beams=5, no_repeat_ngram_size=2, early_stopping=True)
+    outputs = model.generate(inputs.input_ids, max_length=2000, num_return_sequences=1, no_repeat_ngram_size=2, early_stopping=True)  # Changed num_beams to num_return_sequences
     return tokenizer.decode(outputs[0], skip_special_tokens=True)
 
 # Define chatbot response function
