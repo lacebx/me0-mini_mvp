@@ -70,6 +70,11 @@ def chatbot_response(query):
 # Set up Flask app
 app = Flask(__name__)
 
+@app.route("/", methods=["GET"])
+def home():
+    return "Hello, world! The I'm running."
+
+
 @app.route("/chat", methods=["POST"])
 def chat():
     data = request.get_json()
