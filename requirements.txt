@@ -5,12 +5,8 @@ Flask
 Flask-Cors
 PyPDF2
 pdfplumber
-pandas
 numpy
 requests
-beautifulsoup4
-nltk
 scikit-learn
-tensorflow
 torch
 transformers
