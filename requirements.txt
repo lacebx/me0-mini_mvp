@@ -1,16 +1,16 @@
-sentence-transformers: A library for sentence embeddings and semantic textual similarity.
-faiss-cpu: A library for efficient similarity search and clustering of dense vectors.
-python-docx: A library for creating and updating Microsoft Word (.docx) files.
-Flask: A lightweight WSGI web application framework for Python.
-Flask-Cors: A Flask extension for handling Cross-Origin Resource Sharing (CORS).
-PyPDF2: A library for reading and manipulating PDF files.
-pdfplumber: A library for extracting text, tables, and metadata from PDF files.
-pandas: A powerful data manipulation and analysis library.
-numpy: A library for numerical computations.
-requests: A simple HTTP library for making requests to APIs.
-beautifulsoup4: A library for parsing HTML and XML documents.
-nltk: The Natural Language Toolkit, useful for text processing.
-scikit-learn: A machine learning library for Python.
-tensorflow: An open-source library for machine learning and deep learning.
-torch: A deep learning framework that provides a flexible platform for building neural networks.
-transformers: A library for state-of-the-art natural language processing.
+sentence-transformers
+faiss-cpu
+python-docx
+Flask
+Flask-Cors
+PyPDF2
+pdfplumber
+pandas
+numpy
+requests
+beautifulsoup4
+nltk
+scikit-learn
+tensorflow
+torch
+transformers
