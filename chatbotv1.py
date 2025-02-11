@@ -55,26 +55,11 @@ def generate_response(prompt):
 def chatbot_response(query):
     # Check for casual conversation
     casual_responses = {
-        "how are you": "I'm just a program, but I'm here to help you! How can I assist you today?",
-        "hi": "Hello! How can I help you today?",
-        "hello": "Hi there! What can I do for you?",
-        "what can you do": "I can assist you with a wide range of tasks, from answering questions to generating text. How can I help you today?",
-        "what's your purpose": "My purpose is to assist users like you with information and tasks. I'm here to make your life easier!",
-        "can you help me": "Of course! I'll do my best to assist you with whatever you need. Please let me know how I can help.",
-        "how do you work": "I'm a complex system that uses AI and machine learning to understand and respond to user queries. I'm constantly learning and improving!",
-        "are you a human": "No, I'm not a human. I'm a computer program designed to simulate conversation and answer questions to the best of my ability.",
-        "can you understand sarcasm": "I'm getting better at understanding sarcasm, but I'm not perfect yet. Please bear with me if I don't always catch the tone!",
-        "can you tell jokes": "I can try! I have a vast collection of jokes. Would you like to hear one?",
-        "can you summarize": "Yes, I can summarize long pieces of text into shorter, more digestible versions. Please provide the text you'd like me to summarize.",
-        "can you translate": "I can translate text from one language to another. Please provide the text and the languages you'd like to translate between.",
-        "can you write a story": "I'd be happy to generate a story for you. Do you have any specifications or prompts in mind?",
-        "can you chat": "I'm happy to chat with you about any topic you'd like. I'm a good listener and can respond thoughtfully.",
-        "can you play games": "I can play simple text-based games with you. Would you like to play a game of Hangman or 20 Questions?",
-        "can you solve math problems": "I can solve a wide range of math problems, from simple algebra to advanced calculus. Please provide the problem you'd like me to solve.",
-        "can you convert units": "I can convert units of measurement, time, and currency. Please provide the value and the units you'd like to convert.",
-        "can you give advice": "I can provide general advice on a wide range of topics. Please keep in mind that my advice is not a substitute for professional advice.",
-        "can you recommend": "I can recommend books, movies, music, and more based on your preferences. Please let me know what you're interested in, and I'll do my best to suggest something.",
-        "can you explain": "I can explain complex topics in simple terms. Please let me know what you'd like me to explain, and I'll do my best to break it down for you."
+        "greeting": "Hello! How can I help you today?",
+        "status": "I'm just a program, but I'm here to help you!",
+        "farewell": "Goodbye! It was nice chatting with you.",
+        "thanks": "You're welcome! It was my pleasure to assist you.",
+        "how are you": "I'm just a program, but I'm functioning properly. How can I help you today?"
     }
     
      # Normalize the query for easier matching
