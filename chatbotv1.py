@@ -48,7 +48,16 @@ def construct_prompt(query, retrieved_docs):
 # Define response generation
 def generate_response(prompt):
     inputs = tokenizer(prompt, return_tensors="pt")
-    outputs = model.generate(inputs.input_ids, max_length=100, num_return_sequences=1, no_repeat_ngram_size=2, early_stopping=True)  # Changed num_beams to num_return_sequences
+    
+    # Truncate input to a maximum of 512 tokens (or any suitable limit)
+    max_input_length = 512
+    if inputs.input_ids.shape[1] > max_input_length:
+        inputs.input_ids = inputs.input_ids[:, :max_input_length]
+
+    # Set max_new_tokens to a reasonable limit
+    max_new_tokens = 50  # Adjust this value as needed for your use case
+    outputs = model.generate(inputs.input_ids, max_new_tokens=max_new_tokens, no_repeat_ngram_size=2, early_stopping=True)
+    
     return tokenizer.decode(outputs[0], skip_special_tokens=True)
 
 # Define chatbot response function
