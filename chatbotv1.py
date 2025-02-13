@@ -7,8 +7,7 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 from flask import Flask, request, jsonify
 import pdfplumber
 from docx import Document
-import re 
-
+import re
 
 # Load curated data
 with open('curated_data.json', 'r') as f:
@@ -31,8 +30,8 @@ model = AutoModelForCausalLM.from_pretrained(model_name)
 
 # Pre-warm the model
 model.eval()  # Set the model to evaluation mode
-dummy_input = tokenizer("dummy input", return_tensors="pt")  # Create a dummy input
-_ = model.generate(dummy_input.input_ids)  # Run dummy inference
+dummy_input = tokenizer("dummy input", return_tensors="pt")
+_ = model.generate(dummy_input.input_ids)
 
 # Define retrieval function
 def retrieve_documents(query, embedder, index, k=3):
@@ -48,21 +47,23 @@ def construct_prompt(query, retrieved_docs):
 # Define response generation
 def generate_response(prompt):
     inputs = tokenizer(prompt, return_tensors="pt")
-    
-    # Truncate input to a maximum of 512 tokens (or any suitable limit)
+    # Truncate input to a maximum of 512 tokens
     max_input_length = 512
     if inputs.input_ids.shape[1] > max_input_length:
         inputs.input_ids = inputs.input_ids[:, :max_input_length]
 
-    # Set max_new_tokens to a reasonable limit
-    max_new_tokens = 50  # Adjust this value as needed for your use case
-    outputs = model.generate(inputs.input_ids, max_new_tokens=max_new_tokens, no_repeat_ngram_size=2, early_stopping=True)
-    
+    max_new_tokens = 50  # Adjust as needed
+    outputs = model.generate(
+        inputs.input_ids,
+        max_new_tokens=max_new_tokens,
+        no_repeat_ngram_size=2,
+        early_stopping=True
+    )
     return tokenizer.decode(outputs[0], skip_special_tokens=True)
 
 # Define chatbot response function
 def chatbot_response(query):
-    # Check for casual conversation
+    # Pre-defined casual responses
     casual_responses = {
         "greeting": "Hello! How can I help you today?",
         "status": "I'm just a program, but I'm here to help you!",
@@ -71,14 +72,11 @@ def chatbot_response(query):
         "how are you": "I'm just a program, but I'm functioning properly. How can I help you today?"
     }
     
-     # Normalize the query for easier matching
     normalized_query = query.lower().strip()
-    
-    # Check for greetings using a regex (matches "hi", "hello", etc.)
+    # Use regex to match greetings
     if re.search(r'\b(hi|hello|hey)\b', normalized_query):
         return casual_responses["greeting"]
     
-    # Proceed to retrieve documents and generate response if not a casual query
     retrieved_docs = retrieve_documents(query, embedder, index)
     prompt = construct_prompt(query, retrieved_docs)
     return generate_response(prompt)
@@ -88,8 +86,7 @@ app = Flask(__name__)
 
 @app.route("/", methods=["GET"])
 def home():
-    return "Hello, world! The I'm running."
-
+    return "Hello, world! I'm running."
 
 @app.route("/chat", methods=["POST"])
 def chat():
@@ -98,12 +95,13 @@ def chat():
     response = chatbot_response(query)
     return jsonify({"response": response})
 
-# Define error handler for 502 Bad Gateway
+# Error handler for 502 errors
 @app.errorhandler(502)
 def bad_gateway_error(error):
     return jsonify({"error": "Bad Gateway. Please try again later."}), 502
 
 if __name__ == "__main__":
     import os
+    # For production using Gunicorn, the PORT will be managed via Procfile.
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
