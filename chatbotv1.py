@@ -87,8 +87,7 @@ def chatbot_response(query):
 app = Flask(__name__)
 CORS(app)
 
-# Set up Flask app
-app = Flask(__name__)
+
 
 @app.route("/", methods=["GET"])
 def home():
