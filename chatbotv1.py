@@ -98,6 +98,11 @@ def chat():
     response = chatbot_response(query)
     return jsonify({"response": response})
 
+# Define error handler for 502 Bad Gateway
+@app.errorhandler(502)
+def bad_gateway_error(error):
+    return jsonify({"error": "Bad Gateway. Please try again later."}), 502
+
 if __name__ == "__main__":
     import os
     port = int(os.environ.get("PORT", 5000))
