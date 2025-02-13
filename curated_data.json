@@ -1,14 +1,53 @@
 [
     {
-        "id": "resume.pdf",
-        "content": "Ars\u00e8ne Manzi\n2501 E Memorial Road | Edmond, Oklahoma | Tel:929-473-1844 | Email: a.manzi@eagles.oc.edu |\nLinkedIn: LinkedIn\nEDUCATION\nOklahoma Christian University\nBachelor of Science in Computer Science with a focus in Cybersecurity\nPROFESSIONAL EXPERIENCE\nRadicalX Team Lead Dec 2023 - Mar 2024\nArtificial Intelligence Engineer, Nov 2023 - Jan 2024\n\u25cf Spearheaded projects as Team Lead, overseeing a dynamic team and ensuring seamless project\nexecution.\n\u25cf Developed \"ReX,\" an AI Coach leveraging OpenAI, Vertex AI, and TensorFlow to offer\npersonalized career coaching and mentorship.\nGreenbrier, a TMG Company Web3 Analyst Mar 2023 - Jul 2023\n\u25cf Contributed to the analysis and implementation of Web3 technologies, leveraging expertise in\nblockchain and decentralized systems.\nOklahoma Christian University IT Support Technician Jan 2022 - Apr 2023\n\u25cf Provided comprehensive technical support to faculty, staff, and students, resolving hardware and\nsoftware issues and optimizing IT systems.\nCulligan International IT Intern Oct 2019 - Jan 2020\n\u25cf Assisted with the installation, configuration, and maintenance of computer hardware and\nsoftware, contributing to network infrastructure enhancements and IT documentation.\nProjects\nForest Adventure Game\n\u25cf Developed a Python-based text adventure game using OpenAI's GPT-3.5 model to create\nengaging and adaptive scenarios for players navigating a forest.\nLISA\n\u25cf Created an intelligent Python script integrating image recognition, real-time camera feed\nanalysis, file management, command execution, and OpenAI's API to serve as an interactive\nassistant"
+      "id": "bio",
+      "category": "Biography",
+      "content": "I am Arsène Manzi, a dedicated computer science student and software engineer with a passion for cybersecurity, AI, and automation. I believe in the power of technology to transform lives, and I strive to create innovative, secure, and efficient solutions."
     },
     {
-        "id": "coverl.pdf",
-        "content": "Arsene MANZI\n2501 E Memorial Road\nEdmond, Oklahoma, 73013\narsenemanzi@pm.me\n929-473-1844\nDear Hiring Manager,\nI am writing to express my interest in the Software Engineering position. With a strong\nfoundation in full-stack development, a passion for problem-solving, and a commitment to\ncollaborative team environments, I am confident that my skills align with the needs of your\nengineering team.\nThroughout my experience, I have developed expertise in various programming languages,\nincluding Python, Java, and JavaScript frameworks like React and Angular. I have also worked\nextensively on developing REST APIs, building scalable systems, and working with SQL\ndatabases. These experiences have honed my technical abilities and prepared me to deliver\nefficient and high-quality software solutions.\nRecently, I have been actively utilizing the Agile methodology in my projects, which has\nsignificantly improved my ability to work in dynamic environments, collaborate with\ncross-functional teams, and meet changing project requirements. My familiarity with Agile\nprinciples has enhanced my communication skills and my approach to teamwork, making me a\nstrong asset for both project management and technical execution.\nIn addition to my technical proficiency, I pride myself on being adaptable and eager to learn. I\nam always interested in exploring new technologies and improving my skill set to remain at the\nforefront of innovation.\nI am excited about the opportunity to contribute my knowledge and enthusiasm for software\nengineering to your team. Thank you for considering my application. I look forward to the\npossibility of discussing how I can add value and help drive successful projects within your\norganization.\nSincerely,\nArsene"
+      "id": "education-1",
+      "category": "Education",
+      "content": "I am pursuing a Bachelor of Science in Computer Science with a focus on Cybersecurity at Oklahoma Christian University (2020–2024). This program is sharpening my technical skills and deepening my understanding of modern security practices."
     },
     {
-        "id": "software.docx",
-        "content": "CIVICPLUS Incorporated\n302 South 4th Street, Suite 500, Manhattan, Kansas 66502, USA\nScreening Questions Interview for the Position of a Junior Software Engineer (Remote).\nInstructions: Please precede all your answers with the question you are answering.\n\u2003\u2003 Use acronyms only after you've explained them.\n\u2003\u2003\u2003 Use correct spelling and grammar.\nArsene MANZI HIRWA \nAre you currently employed? NO\nDo you work well within a team? YES\nHow has your background prepared you for this role? Knowing the field, I am very certain that I will be working in a team utilizing some sort of project management framework. Therefore, I believe that my experience as a team lead at RadicalX will enable me to continue working well with people in and out of my team. Furthermore, my current project for a coursehub application that uses agile methodology keeps my team working blood hot. \nAdditionally, knowing that there is or will be a lot of work to do including repetitive tasks. My past experience at Greenbrier where I helped automate a lot of the day-to-day workflows will come in handy as I aim to make my and other people\u2019s work simpler and automated. \nWill you be able to devote 20 to 40 hours of your time weekly to the company? YES\nHow can you recognize system error messages and carry out the steps to resolve them? Depending on the environment being utilized, you will notice an error when the application is not responding as planned or when error messages appear as mentioned. When error message is spotted, the best way to go about it is;"
+      "id": "education-2",
+      "category": "Education",
+      "content": "I have also enriched my learning at Alchemy University (2022-2023), where I specialized in Web3 development, and at the University of Nicosia (2022), where I gained hands-on experience with blockchain and decentralized systems."
+    },
+    {
+      "id": "work-experience",
+      "category": "Work Experience",
+      "content": "I have taken on roles such as Team Lead and Artificial Intelligence Engineer, where I led projects like 'ReX', an AI-powered career coaching tool. Additionally, I worked as a Web3 Analyst, IT Support Technician, and IT Intern, experiences that have honed my practical problem-solving skills."
+    },
+    {
+      "id": "projects",
+      "category": "Projects",
+      "content": "I developed an AI-Powered Personal Assistant that uses image recognition and real-time analysis, a Python Text Adventure Game leveraging GPT-based language models, and an E-commerce Web Application that integrates AI for product image analysis and pricing. I have also worked on a Web3 and NFT program and created various automation scripts to streamline repetitive tasks."
+    },
+    {
+      "id": "skills",
+      "category": "Skills",
+      "content": "My key skills include AI integration, scripting and automation, full-stack development, and cybersecurity awareness. I am proficient in Python, AWS, Vue.js, SQL, blockchain technologies, and various machine learning frameworks, and I continuously strive to expand my expertise."
+    },
+    {
+      "id": "philosophy",
+      "category": "Philosophy",
+      "content": "I value honesty, simplicity, and continuous learning. I believe in leveraging technology as a tool to empower human decision-making while ensuring that every solution I develop is both innovative and practical."
+    },
+    {
+      "id": "certifications",
+      "category": "Certifications",
+      "content": "I have earned certifications in cybersecurity and blockchain technology, which validate my skills and demonstrate my commitment to professional growth in an ever-evolving tech landscape."
+    },
+    {
+      "id": "interests",
+      "category": "Interests",
+      "content": "I am fascinated by the potential of artificial intelligence, the challenges of cybersecurity, and the innovative possibilities within blockchain and Web3. I enjoy exploring how these domains intersect to create new opportunities and transformative solutions."
+    },
+    {
+      "id": "achievements",
+      "category": "Achievements",
+      "content": "Throughout my academic and professional journey, I have led impactful projects, collaborated with diverse teams, and achieved milestones that reflect my dedication and expertise. I am proud of my contributions and look forward to making an even greater impact in the future."
     }
-]
+  ]
+  
