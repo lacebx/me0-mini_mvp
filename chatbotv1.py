@@ -109,5 +109,5 @@ def bad_gateway_error(error):
 if __name__ == "__main__":
     import os
     # For production using Gunicorn, the PORT will be managed via Procfile.
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 8080))
     app.run(host="0.0.0.0", port=port)
