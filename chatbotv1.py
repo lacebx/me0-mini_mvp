@@ -8,6 +8,9 @@ from flask import Flask, request, jsonify
 import pdfplumber
 from docx import Document
 import re
+from flask import Flask, request, jsonify
+from flask_cors import CORS
+
 
 # Load curated data
 with open('curated_data.json', 'r') as f:
@@ -80,6 +83,9 @@ def chatbot_response(query):
     retrieved_docs = retrieve_documents(query, embedder, index)
     prompt = construct_prompt(query, retrieved_docs)
     return generate_response(prompt)
+
+app = Flask(__name__)
+CORS(app)
 
 # Set up Flask app
 app = Flask(__name__)
