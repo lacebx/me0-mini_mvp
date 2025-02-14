@@ -10,6 +10,11 @@ from docx import Document
 import re
 from flask import Flask, request, jsonify
 from flask_cors import CORS
+import os
+import subprocess
+import schedule
+import time
+import threading
 
 
 # Load curated data
@@ -45,7 +50,7 @@ def retrieve_documents(query, embedder, index, k=3):
 # Define prompt construction
 def construct_prompt(query, retrieved_docs):
     context = "\n".join(retrieved_docs)
-    return f"Context:\n{context}\n\nUser Query: {query}\n\nAnswer as Arsene:"
+    return f"\n{context}\n {query}\n"
 
 # Define response generation
 def generate_response(prompt):
@@ -63,6 +68,19 @@ def generate_response(prompt):
         early_stopping=True
     )
     return tokenizer.decode(outputs[0], skip_special_tokens=True)
+
+# Define a function to log prompts and responses
+def log_data(prompt, response):
+    log_entry = {
+        "prompt": prompt,
+        "response": response
+    }
+    # Ensure the log file exists
+    if not os.path.exists('logs'):
+        os.makedirs('logs')
+    # Append the log entry to a JSON file
+    with open('logs/collected_data.json', 'a') as log_file:
+        log_file.write(json.dumps(log_entry) + "\n")
 
 # Define chatbot response function
 def chatbot_response(query):
@@ -93,7 +111,12 @@ def chatbot_response(query):
         return casual_responses["how are you"]
     retrieved_docs = retrieve_documents(query, embedder, index)
     prompt = construct_prompt(query, retrieved_docs)
-    return generate_response(prompt)
+    response = generate_response(prompt)
+    
+    # Log the prompt and response
+    log_data(prompt, response)
+    
+    return response
 
 app = Flask(__name__)
 CORS(app)
@@ -116,8 +139,43 @@ def chat():
 def bad_gateway_error(error):
     return jsonify({"error": "Bad Gateway. Please try again later."}), 502
 
+# Function to push collected data to GitHub
+def push_to_github():
+    # Change to the directory where your repo is located in the Railway environment
+    os.chdir('/app')  # Update this path based on your Railway setup
+
+    # Get the GitHub token from environment variables
+    token = os.environ.get('GITHUB_TOKEN')  # Access the token
+
+    if token:
+        # Configure Git to use the token for authentication
+        subprocess.run(['git', 'config', '--global', 'credential.helper', 'store'])
+        with open(os.path.expanduser('~/.git-credentials'), 'w') as f:
+            f.write(f'https://{token}:x-oauth-basic@github.com\n')
+
+    # Add the collected_data.json file to git
+    subprocess.run(['git', 'add', 'logs/collected_data.json'])
+    
+    # Commit the changes
+    subprocess.run(['git', 'commit', '-m', 'Update collected_data.json'])
+    
+    # Push to the repository
+    subprocess.run(['git', 'push', 'origin', 'main'])  # Update 'main' if your branch is different
+
+# Schedule the job to run every hour (adjust as needed)
+schedule.every(1).hours.do(push_to_github)
+
+# Run the scheduler in a separate thread
+def run_scheduler():
+    while True:
+        schedule.run_pending()
+        time.sleep(1)
+
+# Start the scheduler in a separate thread
+scheduler_thread = threading.Thread(target=run_scheduler)
+scheduler_thread.start()
+
 if __name__ == "__main__":
-    import os
     # For production using Gunicorn, the PORT will be managed via Procfile.
     port = int(os.environ.get("PORT", 8080))
     app.run(host="0.0.0.0", port=port)
