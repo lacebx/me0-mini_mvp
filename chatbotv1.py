@@ -15,6 +15,7 @@ import subprocess
 import schedule
 import time
 import threading
+import shutil
 
 
 # Load curated data
@@ -147,11 +148,36 @@ def list_directory():
 def bad_gateway_error(error):
     return jsonify({"error": "Bad Gateway. Please try again later."}), 502
 
-# Function to push collected data to GitHub
-def push_to_github():
-    # Change to the directory where your repo is located in the Railway environment
-    os.chdir('/app')  # Update this path based on your Railway setup
+def ensure_git_repo():
+    if not os.path.exists('.git'):
+        # Clone the repository into a temporary directory
+        temp_dir = '/tmp/repo_clone'
+        subprocess.run(['git', 'clone', 'https://github.com/lacebx/me0-mini_mvp.git', temp_dir])  # Update the URL as needed
+        
+        # Copy the necessary files back to the original directory
+        for item in os.listdir(temp_dir):
+            s = os.path.join(temp_dir, item)
+            d = os.path.join('/app', item)  # Assuming '/app' is your working directory
+            if os.path.isdir(s):
+                shutil.copytree(s, d, False, None)
+            else:
+                shutil.copy2(s, d)
 
+        # Change to the original directory
+        os.chdir('/app')  # Change to your working directory
+
+# Call this function at the start of your push_to_github function
+def push_to_github():
+    ensure_git_repo()  # Ensure the repo is cloned and set up
+
+    # Add the collected_data.json file to git
+    subprocess.run(['git', 'add', 'logs/collected_data.json'])  # Adjust the path as necessary
+    
+    # Commit the changes
+    subprocess.run(['git', 'commit', '-m', 'Update collected_data.json'])
+    
+    # Push to the repository
+    subprocess.run(['git', 'push', 'origin', 'main'])  # Update 'main' if your branch is different
     # Get the GitHub token from environment variables
     token = os.environ.get('GITHUB_TOKEN')  # Access the token
 
