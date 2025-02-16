@@ -134,7 +134,15 @@ def chat():
     response = chatbot_response(query)
     return jsonify({"response": response})
 
-# Error handler for 502 errors
+@app.route("/check_git", methods=["GET"])
+def check_git():
+    return jsonify({"current_directory": os.getcwd(), "is_git_repo": os.path.exists('.git')})
+
+@app.route("/list_dir", methods=["GET"])
+def list_directory():
+    # List the current directory
+    dir_contents = subprocess.run(['ls'], capture_output=True, text=True)
+    return jsonify({"directory_contents": dir_contents.stdout}), 200
 @app.errorhandler(502)
 def bad_gateway_error(error):
     return jsonify({"error": "Bad Gateway. Please try again later."}), 502
