@@ -84,6 +84,7 @@ def log_data(prompt, response):
     # Append the log entry to a JSON file
     with open('logs/collected_data.json', 'a') as log_file:
         log_file.write(json.dumps(log_entry) + "\n")
+    print("Collected data has been created and logged.")
 
 # Define chatbot response function
 def chatbot_response(query):
@@ -152,6 +153,7 @@ def bad_gateway_error(error):
 
 def ensure_git_repo():
     if not os.path.exists('.git'):
+        print("Cloning the repository into a temporary directory...")
         # Clone the repository into a temporary directory
         temp_dir = '/tmp/repo_clone'
         subprocess.run(['git', 'clone', 'https://github.com/lacebx/me0-mini_mvp.git', temp_dir])  # Update the URL as needed
@@ -167,14 +169,15 @@ def ensure_git_repo():
 
         # Change to the original directory
         os.chdir('/app')  # Change to your working directory
+        print("Repository cloned and files copied.")
 
-# Call this function at the start of your push_to_github function
 def push_to_github():
     ensure_git_repo()  # Ensure the repo is cloned and set up
 
     # Set Git user name and email
     subprocess.run(['git', 'config', '--global', 'user.email', 'your_email@example.com'])  # Replace with your email
     subprocess.run(['git', 'config', '--global', 'user.name', 'Your Name'])  # Replace with your name
+    print("GitHub user configuration set.")
 
     # Get the GitHub token from environment variables
     token = os.environ.get('GITHUB_TOKEN')  # Ensure this is set in Railway environment
@@ -184,15 +187,22 @@ def push_to_github():
         subprocess.run(['git', 'config', '--global', 'credential.helper', 'store'])
         with open(os.path.expanduser('~/.git-credentials'), 'w') as f:
             f.write(f'https://{token}:x-oauth-basic@github.com\n')
+        print("GitHub token configured for authentication.")
 
     # Add the collected_data.json file to git
     subprocess.run(['git', 'add', 'logs/collected_data.json'])  # Adjust the path as necessary
-    
+    print("Collected data added to Git staging area.")
+
     # Commit the changes
     subprocess.run(['git', 'commit', '-m', 'Update collected_data.json'])
-    
+    print("Changes committed to Git.")
+
     # Push to the repository
-    subprocess.run(['git', 'push', 'origin', 'main'])  # Update 'main' if your branch is different
+    push_result = subprocess.run(['git', 'push', 'origin', 'main'], capture_output=True, text=True)  # Update 'main' if your branch is different
+    if push_result.returncode == 0:
+        print("Changes pushed to GitHub successfully.")
+    else:
+        print(f"Failed to push changes to GitHub: {push_result.stderr}")
 
 # Schedule the job to run every hour (adjust as needed)
 schedule.every(1).hours.do(push_to_github)
