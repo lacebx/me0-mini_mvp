@@ -66,7 +66,9 @@ def generate_response(prompt):
         inputs.input_ids,
         max_new_tokens=max_new_tokens,
         no_repeat_ngram_size=2,
-        early_stopping=True
+        early_stopping=True,
+        attention_mask=inputs['attention_mask'],  # Pass the attention mask
+        pad_token_id=tokenizer.eos_token_id  # Set pad token ID
     )
     return tokenizer.decode(outputs[0], skip_special_tokens=True)
 
@@ -171,8 +173,17 @@ def push_to_github():
     ensure_git_repo()  # Ensure the repo is cloned and set up
 
     # Set Git user name and email
-    subprocess.run(['git', 'config', '--global', 'user.email', 'arsenemanzi@pm.me'])  # Replace with your email
-    subprocess.run(['git', 'config', '--global', 'user.name', 'lacebx'])  # Replace with your name
+    subprocess.run(['git', 'config', '--global', 'user.email', 'your_email@example.com'])  # Replace with your email
+    subprocess.run(['git', 'config', '--global', 'user.name', 'Your Name'])  # Replace with your name
+
+    # Get the GitHub token from environment variables
+    token = os.environ.get('GITHUB_TOKEN')  # Ensure this is set in Railway environment
+
+    if token:
+        # Configure Git to use the token for authentication
+        subprocess.run(['git', 'config', '--global', 'credential.helper', 'store'])
+        with open(os.path.expanduser('~/.git-credentials'), 'w') as f:
+            f.write(f'https://{token}:x-oauth-basic@github.com\n')
 
     # Add the collected_data.json file to git
     subprocess.run(['git', 'add', 'logs/collected_data.json'])  # Adjust the path as necessary
