@@ -170,25 +170,12 @@ def ensure_git_repo():
 def push_to_github():
     ensure_git_repo()  # Ensure the repo is cloned and set up
 
+    # Set Git user name and email
+    subprocess.run(['git', 'config', '--global', 'user.email', 'arsenemanzi@pm.me'])  # Replace with your email
+    subprocess.run(['git', 'config', '--global', 'user.name', 'lacebx'])  # Replace with your name
+
     # Add the collected_data.json file to git
     subprocess.run(['git', 'add', 'logs/collected_data.json'])  # Adjust the path as necessary
-    
-    # Commit the changes
-    subprocess.run(['git', 'commit', '-m', 'Update collected_data.json'])
-    
-    # Push to the repository
-    subprocess.run(['git', 'push', 'origin', 'main'])  # Update 'main' if your branch is different
-    # Get the GitHub token from environment variables
-    token = os.environ.get('GITHUB_TOKEN')  # Access the token
-
-    if token:
-        # Configure Git to use the token for authentication
-        subprocess.run(['git', 'config', '--global', 'credential.helper', 'store'])
-        with open(os.path.expanduser('~/.git-credentials'), 'w') as f:
-            f.write(f'https://{token}:x-oauth-basic@github.com\n')
-
-    # Add the collected_data.json file to git
-    subprocess.run(['git', 'add', 'logs/collected_data.json'])
     
     # Commit the changes
     subprocess.run(['git', 'commit', '-m', 'Update collected_data.json'])
