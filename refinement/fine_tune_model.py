@@ -9,7 +9,7 @@ dataset = load_dataset('json', data_files='cleaned_data.json')
 train_test_split = dataset['train'].train_test_split(test_size=0.2)  # 20% for testing
 
 # Load the tokenizer and model
-model_name = "gpt2"  # Replace with your model name
+model_name = "EleutherAI/gpt-neo-125M"  # Replace with your model name
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 
 # Set the padding token
