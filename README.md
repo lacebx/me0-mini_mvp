@@ -40,7 +40,7 @@ pip install -r requirements.txt
 
 ### Clone the Repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/lacebx/me0-mini_mvp.git
 cd project-directory
 ```
 
@@ -67,7 +67,7 @@ When I push changes to my Git repository, Railway automatically redeploys my app
 
 ### CORS and Integration:
 
-    I enable CORS in my Flask app so that my chatbot API can be accessed from my portfolio site without cross-origin issues. My portfolio widget uses JavaScript to interact with the deployed API.
+I enable CORS in my Flask app so that my chatbot API can be accessed from my portfolio site without cross-origin issues. My portfolio widget uses JavaScript to interact with the deployed API.
 
 Usage
 
@@ -75,32 +75,32 @@ After deploying, my chatbot API is available at a public URL (e.g., https://me0-
 
 #### Input Processing:
 
-    The query is normalized and, if it’s a casual greeting (e.g., "hi", "hello"), a pre-defined response is returned immediately.
+The query is normalized and, if it’s a casual greeting (e.g., "hi", "hello"), a pre-defined response is returned immediately.
 
 #### Context Retrieval:
 
-    If the query is not a simple greeting, my system computes embeddings for the query and retrieves the most relevant snippets from curated_data.json using FAISS.
+If the query is not a simple greeting, my system computes embeddings for the query and retrieves the most relevant snippets from curated_data.json using FAISS.
 
 #### Response Generation:
 
-    The retrieved snippets are combined with the query to form a prompt, which is then fed to the GPT-Neo model to generate a personalized response.
+The retrieved snippets are combined with the query to form a prompt, which is then fed to the GPT-Neo model to generate a personalized response.
 
 #### Logging:
 
-    The prompt and the generated response are logged for future refinement and analysis.
+The prompt and the generated response are logged for future refinement and analysis.
 
 ## Customization and Fine-Tuning
 
 #### Dataset Updates:
 
-    I continuously update curated_data.json as I gain new experiences, skills, and insights.
+I continuously update curated_data.json as I gain new experiences, skills, and insights.
 
 #### Model Fine-Tuning:
 
-    For further improvements, I have an optional refinement/ directory with scripts and a dataset (cleaned_data.json) for fine-tuning the model on my specific conversational style and desired responses(more info can be found in the README.md file inside the refinement dir)
+For further improvements, I have an optional refinement/ directory with scripts and a dataset (cleaned_data.json) for fine-tuning the model on my specific conversational style and desired responses(more info can be found in the README.md file inside the refinement dir)
 
 #### Parameter Tuning:
-    You can adjust parameters such as max_new_tokens in the response generation function to balance between response length and latency.
+You can adjust parameters such as max_new_tokens in the response generation function to balance between response length and latency.
 
 ### Contributing
 
