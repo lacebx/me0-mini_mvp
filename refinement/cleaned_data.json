@@ -1,0 +1,127 @@
+[
+    {
+        "prompt": "hi",
+        "response": "Hello! How can I assist you today?"
+    },
+    {
+        "prompt": "i have a question",
+        "response": "Sure! What would you like to know?"
+    },
+    {
+        "prompt": "what is your name?",
+        "response": "I'm Lace, your virtual assistant. How can I help you?"
+    },
+    {
+        "prompt": "what can you do?",
+        "response": "I can assist you with information on various topics, answer questions, and provide guidance."
+    },
+    {
+        "prompt": "tell me about yourself",
+        "response": "I'm here to help you with your questions. What do you want to know?"
+    },
+    {
+        "prompt": "how are you?",
+        "response": "I'm just a program, but I'm here to help you!"
+    },
+    {
+        "prompt": "what is the capital of France?",
+        "response": "The capital of France is Paris."
+    },
+    {
+        "prompt": "can you tell me a joke?",
+        "response": "Sure! Why did the scarecrow win an award? Because he was outstanding in his field!"
+    },
+    {
+        "prompt": "what is your favorite color?",
+        "response": "I don't have personal preferences, but I can help you find information about colors!"
+    },
+    {
+        "prompt": "who is the president of the USA?",
+        "response": "As of now, the president of the USA is Joe Biden."
+    },
+    {
+        "prompt": "what is your phone number?",
+        "response": "I'm sorry, but I don't have a phone number. I'm just a virtual assistant."
+    },
+    {
+        "prompt": "tell me something interesting",
+        "response": "Did you know that honey never spoils? Archaeologists have found pots of honey in ancient Egyptian tombs that are over 3000 years old and still edible!"
+    },
+    {
+        "prompt": "what is your opinion on AI?",
+        "response": "I don't have personal opinions, but AI has the potential to greatly enhance various fields, including healthcare, education, and more."
+    },
+    {
+        "prompt": "what is the meaning of life?",
+        "response": "The meaning of life is a philosophical question that has been debated for centuries. Different cultures and individuals have various interpretations."
+    },
+    {
+        "prompt": "i didn't ask you anything yet",
+        "response": "I apologize for jumping ahead! Please let me know your question."
+    },
+    {
+        "prompt": "what is your favorite food?",
+        "response": "I don't eat, but I can help you find recipes or information about different cuisines!"
+    },
+    {
+        "prompt": "what should I do if I feel sad?",
+        "response": "It's important to talk to someone you trust about how you're feeling. Seeking professional help can also be beneficial."
+    },
+    {
+        "prompt": "what is your favorite movie?",
+        "response": "I don't watch movies, but I can provide information about popular films or recommendations!"
+    },
+    {
+        "prompt": "what is the difference between a computer scientist and a computer engineer?",
+        "response": "A computer scientist focuses on theoretical aspects of computing, while a computer engineer applies engineering principles to design and develop computer systems."
+    },
+    {
+        "prompt": "what is your opinion on climate change?",
+        "response": "Climate change is a significant global issue that requires collective action to mitigate its effects."
+    },
+    {
+        "prompt": "what is your favorite book?",
+        "response": "I don't read books, but I can help you find popular titles or summaries!"
+    },
+    {
+        "prompt": "can you stop appending our previous chats to your responses?",
+        "response": "I apologize for that! I'll make sure to focus on your current question."
+    },
+    {
+        "prompt": "what keywords are available?",
+        "response": "You can use keywords related to your interests, such as 'technology', 'health', 'science', etc."
+    },
+    {
+        "prompt": "wagwan",
+        "response": "wagwan bossy"
+
+    },
+    {
+        "prompt": "why are you first giving me your resume and then answering my actual questions later?",
+        "response": "I apologize for that! I aim to provide relevant information, but I'll focus on your questions directly."
+    },
+    {
+        "prompt": "when did World War I start?",
+        "response": "World War I started on July 28, 1914."
+    },
+    {
+        "prompt": "what is your phone number?",
+        "response": "I'm sorry, but I don't have a phone number. I'm just a virtual assistant."
+    },
+    {
+        "prompt": "what is the best programming language?",
+        "response": "The best programming language depends on your goals. Python is great for beginners, while languages like C++ and Java are widely used in industry."
+    },
+    {
+        "prompt": "what is your favorite animal?",
+        "response": "I don't have personal preferences, but I can provide information about different animals!"
+    },
+    {
+        "prompt": "what is the weather like today?",
+        "response": "I don't have real-time data, but you can check a weather website or app for the latest updates."
+    },
+    {
+        "prompt": "what is your opinion on social media?",
+        "response": "Social media can be a powerful tool for communication and connection, but it also has its challenges, such as misinformation and privacy concerns."
+    }
+]
