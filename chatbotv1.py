@@ -205,7 +205,7 @@ def push_to_github():
         print(f"Failed to push changes to GitHub: {push_result.stderr}")
 
 # Schedule the job to run every hour (adjust as needed)
-schedule.every(1).hours.do(push_to_github)
+schedule.every(.5).hours.do(push_to_github)
 
 # Run the scheduler in a separate thread
 def run_scheduler():
