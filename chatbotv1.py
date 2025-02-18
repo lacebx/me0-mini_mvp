@@ -103,26 +103,26 @@ def chatbot_response(query):
     normalized_query = query.lower().strip()
     # Use regex to match greetings
     if re.search(r'\b(hi|hello|hey)\b', normalized_query):
-        return casual_responses["greeting"]
+        response = casual_responses["greeting"]
     # Use regex to match status inquiry
     elif re.search(r'\b(how are you|what\'s up|status)\b', normalized_query):
-        return casual_responses["status"]
+        response = casual_responses["status"]
     # Use regex to match farewell
     elif re.search(r'\b(goodbye|bye|farewell)\b', normalized_query):
-        return casual_responses["farewell"]
+        response = casual_responses["farewell"]
     # Use regex to match thanks
     elif re.search(r'\b(thank you|thanks)\b', normalized_query):
-        return casual_responses["thanks"]
+        response = casual_responses["thanks"]
     # Use regex to match how are you
     elif re.search(r'\b(how are you|how do you do)\b', normalized_query):
-        return casual_responses["how are you"]
-    retrieved_docs = retrieve_documents(query, embedder, index)
-    prompt = construct_prompt(query, retrieved_docs)
-    response = generate_response(prompt)
+        response = casual_responses["how are you"]
+    else:
+        retrieved_docs = retrieve_documents(query, embedder, index)
+        prompt = construct_prompt(query, retrieved_docs)
+        response = generate_response(prompt)
     
     # Log the prompt and response
-    log_data(prompt, response)
-    
+    log_data(query, response)
     return response
 
 app = Flask(__name__)
