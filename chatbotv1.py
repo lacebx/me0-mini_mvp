@@ -16,7 +16,10 @@ import schedule
 import time
 import threading
 import shutil
+import logging
 
+# Set up logging
+logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Load curated data
 with open('curated_data.json', 'r') as f:
@@ -153,7 +156,7 @@ def bad_gateway_error(error):
 
 def ensure_git_repo():
     if not os.path.exists('.git'):
-        print("Cloning the repository into a temporary directory...")
+        logging.info("Cloning the repository into a temporary directory...")
         # Clone the repository into a temporary directory
         temp_dir = '/tmp/repo_clone'
         subprocess.run(['git', 'clone', 'https://github.com/lacebx/me0-mini_mvp.git', temp_dir])  # Update the URL as needed
@@ -163,13 +166,46 @@ def ensure_git_repo():
             s = os.path.join(temp_dir, item)
             d = os.path.join('/app', item)  # Assuming '/app' is your working directory
             if os.path.isdir(s):
-                shutil.copytree(s, d, False, None)
+                if not os.path.exists(d):  # Check if the directory already exists
+                    shutil.copytree(s, d, False, None)
+                    logging.info(f"Copied directory {s} to {d}.")
             else:
                 shutil.copy2(s, d)
+                logging.info(f"Copied file {s} to {d}.")
 
         # Change to the original directory
         os.chdir('/app')  # Change to your working directory
-        print("Repository cloned and files copied.")
+        logging.info("Repository cloned and files copied.")
+    else:
+        logging.info("Repository already exists. Appending to collected_data.json.")
+
+    # Append new interaction to collected_data.json
+    append_to_collected_data()
+
+def append_to_collected_data():
+    log_entry = {
+        "prompt": "User prompt here",  # Replace with actual user prompt
+        "response": "Model response here"  # Replace with actual model response
+    }
+    
+    # Ensure the log file exists
+    if not os.path.exists('logs'):
+        os.makedirs('logs')
+
+    # Append the log entry to the JSON file
+    log_file_path = 'logs/collected_data.json'
+    if os.path.exists(log_file_path):
+        with open(log_file_path, 'r+') as log_file:
+            data = json.load(log_file)
+            data.append(log_entry)  # Append new entry
+            log_file.seek(0)  # Move the cursor to the beginning of the file
+            json.dump(data, log_file, indent=4)  # Write updated data back to the file
+            log_file.truncate()  # Remove any leftover data
+            logging.info("Appended new interaction to collected_data.json.")
+    else:
+        with open(log_file_path, 'w') as log_file:
+            json.dump([log_entry], log_file, indent=4)  # Create new file with the first entry
+            logging.info("Created collected_data.json and added the first interaction.")
 
 def push_to_github():
     ensure_git_repo()  # Ensure the repo is cloned and set up
