@@ -195,13 +195,19 @@ def append_to_collected_data():
     # Append the log entry to the JSON file
     log_file_path = 'logs/collected_data.json'
     if os.path.exists(log_file_path):
-        with open(log_file_path, 'r+') as log_file:
-            data = json.load(log_file)
-            data.append(log_entry)  # Append new entry
-            log_file.seek(0)  # Move the cursor to the beginning of the file
-            json.dump(data, log_file, indent=4)  # Write updated data back to the file
-            log_file.truncate()  # Remove any leftover data
-            logging.info("Appended new interaction to collected_data.json.")
+        try:
+            with open(log_file_path, 'r+') as log_file:
+                data = json.load(log_file)
+                data.append(log_entry)  # Append new entry
+                log_file.seek(0)  # Move the cursor to the beginning of the file
+                json.dump(data, log_file, indent=4)  # Write updated data back to the file
+                log_file.truncate()  # Remove any leftover data
+                logging.info("Appended new interaction to collected_data.json.")
+        except json.JSONDecodeError:
+            logging.error("JSONDecodeError: The collected_data.json file is corrupted. Creating a new file.")
+            with open(log_file_path, 'w') as log_file:
+                json.dump([log_entry], log_file, indent=4)  # Create new file with the first entry
+                logging.info("Created collected_data.json and added the first interaction.")
     else:
         with open(log_file_path, 'w') as log_file:
             json.dump([log_entry], log_file, indent=4)  # Create new file with the first entry
