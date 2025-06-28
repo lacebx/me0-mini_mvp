@@ -20,10 +20,11 @@ jobs:
 
       - name: Install dependencies (for lint/test, optional)
         run: |
-          sudo apt-get update   
+          sudo apt-get update
           sudo apt-get install -y build-essential libopenblas-dev
           python -m pip install --upgrade pip
-          pip install -r requirements.txt --verbose
+          pip install -r requirements.txt --verbose || true
+          cat ~/.pip/pip.log || true
 
       - name: Archive project files
         run: |
@@ -36,7 +37,7 @@ jobs:
           username: ${{ secrets.SERVER_USER }}
           key: ${{ secrets.SERVER_SSH_KEY }}
           source: "app.tar.gz"
-          target: "/home/ubuntu/nodeapps/2025/flight-plan/t8"
+          target: "/home/ubuntu/nodeapps/2024/project1"
 
       - name: Deploy on AWS server
         uses: appleboy/ssh-action@v1.0.3
