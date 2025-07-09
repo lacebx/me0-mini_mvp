@@ -1,7 +1,0 @@
-# Ignore Python cache and virtualenvs
-.env
-__pycache__/
-*.pyc
-
-
-
