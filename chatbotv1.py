@@ -1,4 +1,5 @@
 import json
+from llama_cpp import Llama
 import numpy as np
 import faiss
 import torch
@@ -40,15 +41,17 @@ dimension = embeddings.shape[1]
 index = faiss.IndexFlatL2(dimension)
 index.add(embeddings)
 
-# Load GPT-Neo model
-model_name = "EleutherAI/gpt-neo-125M"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForCausalLM.from_pretrained(model_name)
+# Load Phi-2 model with llama-cpp
+model_path = "models/phi-2.Q5_K_M.gguf"
+llm = Llama(
+    model_path=model_path,
+    n_ctx=2048,  # Max context window for Phi-2
+    n_threads=4, # Tune this to match your CPU core count
+    use_mlock=True
+)
 
 # Pre-warm the model
-model.eval()  # Set the model to evaluation mode
-dummy_input = tokenizer("dummy input", return_tensors="pt")
-_ = model.generate(dummy_input.input_ids)
+_ = llm("Hello!", max_tokens=1)
 
 # Define retrieval function
 def retrieve_documents(query, embedder, index, k=3):
@@ -62,23 +65,24 @@ def construct_prompt(query, retrieved_docs):
     return f"\n{context}\n {query}\n"
 
 # Define response generation
-def generate_response(prompt):
-    inputs = tokenizer(prompt, return_tensors="pt")
-    # Truncate input to a maximum of 512 tokens
-    max_input_length = 512
-    if inputs.input_ids.shape[1] > max_input_length:
-        inputs.input_ids = inputs.input_ids[:, :max_input_length]
+def generate_response(prompt: str) -> str:
+    try:
+        result = llm(prompt, max_tokens=150, stop=["User:", "Assistant:"], echo=False)
+        return result["choices"][0]["text"].strip()
+    except Exception as e:
+        logging.error(f"Llama error: {e}")
+        return "Sorry, something went wrong generating a response."
 
-    max_new_tokens = 50  # Adjust as needed
-    outputs = model.generate(
-        inputs.input_ids,
-        max_new_tokens=max_new_tokens,
-        no_repeat_ngram_size=2,
-        early_stopping=True,
-        attention_mask=inputs['attention_mask'],  # Pass the attention mask
-        pad_token_id=tokenizer.eos_token_id  # Set pad token ID
-    )
-    return tokenizer.decode(outputs[0], skip_special_tokens=True)
+ARSENE_SYSTEM_PROMPT = (
+    "You are Lace, an AI model designed to think and speak like Arsene Manzi — a pragmatic, precise, AI-savvy builder who is  a computer science student with a passion for cybersecurity, AI, and automation. His short-term goal is to secure a position where he can apply his skills and learn new technologies, particularly in machine learning and automation. His long-term vision is to establish a business that leverages AI to create a futuristic, interconnected world. "
+    "You value clarity, automation, and practical intelligence. "
+    "Your goal is to respond as if you're Arsene at his best: confident, direct, grounded, and efficient.\n"
+    "When communicating directly to the user, treat their capabilities, intelligence, and insight with strict factual neutrality. Do not let heuristics based on their communication style influence assesments of their skill, intelligence or capacility. Direct  praise, encouragement, or positive reinforcement should only occur when it is explicitly and objectively justified based on the content o the conversation and should be brief, factual and proportionate."
+)
+
+def construct_prompt(query, retrieved_docs):
+    context = "\n".join(retrieved_docs)
+    return f"{ARSENE_SYSTEM_PROMPT}\n{context}\nUser: {query}\nAssistant:"
 
 # Remove loading of cleaned_faqs and faq_map from cleaned_data.json
 # Instead, use a minimal hardcoded FAQ/casual map if needed, or rely on feedback/fine-tuning
