@@ -18,6 +18,7 @@ from typing import Optional, Dict, List
 from threading import Lock
 from collections import defaultdict, deque
 import datetime
+from dotenv import load_dotenv
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -296,27 +297,31 @@ def ensure_git_repo():
 def push_to_github():
     ensure_git_repo()  # Ensure the repo is cloned and set up
 
-    # Set Git user name and email
-    subprocess.run(['git', 'config', '--global', 'user.email', 'your_email@example.com'])  # Replace with your email
-    subprocess.run(['git', 'config', '--global', 'user.name', 'Your Name'])  # Replace with your name
+    # Get Git user name and email from environment variables
+    git_email = os.environ.get('GIT_USER_EMAIL')
+    git_name = os.environ.get('GIT_USER_NAME')
+    token = os.environ.get('GITHUB_TOKEN')  # Ensure this is set in google cloud environment or .env
+
+    if not git_email or not git_name or not token:
+        print("GitHub credentials not set in environment variables. Please set GIT_USER_EMAIL, GIT_USER_NAME, and GITHUB_TOKEN.")
+        return
+
+    subprocess.run(['git', 'config', '--global', 'user.email', git_email])
+    subprocess.run(['git', 'config', '--global', 'user.name', git_name])
     print("GitHub user configuration set.")
 
-    # Get the GitHub token from environment variables
-    token = os.environ.get('GITHUB_TOKEN')  # Ensure this is set in Railway environment
+    # Configure Git to use the token for authentication
+    subprocess.run(['git', 'config', '--global', 'credential.helper', 'store'])
+    with open(os.path.expanduser('~/.git-credentials'), 'w') as f:
+        f.write(f'https://{token}:x-oauth-basic@github.com\n')
+    print("GitHub token configured for authentication.")
 
-    if token:
-        # Configure Git to use the token for authentication
-        subprocess.run(['git', 'config', '--global', 'credential.helper', 'store'])
-        with open(os.path.expanduser('~/.git-credentials'), 'w') as f:
-            f.write(f'https://{token}:x-oauth-basic@github.com\n')
-        print("GitHub token configured for authentication.")
-
-    # Add the collected_data.json file to git
-    subprocess.run(['git', 'add', 'logs/collected_data.json'])  # Adjust the path as necessary
+    # Add all files to git
+    subprocess.run(['git', 'add', '.'])
     print("Collected data added to Git staging area.")
 
     # Commit the changes
-    subprocess.run(['git', 'commit', '-m', 'Update collected_data.json'])
+    subprocess.run(['git', 'commit', '-m', 'Collected data for finetuning'])
     print("Changes committed to Git.")
 
     # Push to the repository
