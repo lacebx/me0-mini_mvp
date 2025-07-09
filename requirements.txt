@@ -1,4 +1,5 @@
 sentence-transformers
+python-dotenv
 faiss-cpu
 python-docx
 Flask
