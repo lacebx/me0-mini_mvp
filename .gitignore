@@ -1,0 +1,10 @@
+# Ignore Python cache and virtualenvs
+__pycache__/
+*.pyc
+venv/
+.env
+
+
+
+# Ignore logs if you want to keep them private
+# logs/
