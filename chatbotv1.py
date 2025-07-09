@@ -5,10 +5,7 @@ import torch
 from sentence_transformers import SentenceTransformer
 from transformers import AutoModelForCausalLM, AutoTokenizer
 from flask import Flask, request, jsonify
-import pdfplumber
-from docx import Document
 import re
-from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
 import subprocess
@@ -17,9 +14,15 @@ import time
 import threading
 import shutil
 import logging
+from typing import Optional, Dict, List
+from threading import Lock
+from collections import defaultdict, deque
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Thread lock for logging
+log_lock = Lock()
 
 # Load curated data
 with open('curated_data.json', 'r') as f:
@@ -75,53 +78,109 @@ def generate_response(prompt):
     )
     return tokenizer.decode(outputs[0], skip_special_tokens=True)
 
-# Define a function to log prompts and responses
-def log_data(prompt, response):
+# Load FAQ/casual responses from cleaned_data.json
+with open('refinement/cleaned_data.json', 'r') as f:
+    cleaned_faqs = json.load(f)
+
+# Build a normalized FAQ map for quick lookup
+faq_map = {q['prompt'].strip().lower(): q['response'] for q in cleaned_faqs}
+
+# Add additional direct FAQ/casual patterns
+faq_patterns = [
+    (re.compile(r'^(hi|hello|hey|greetings)[!. ]*$', re.I), faq_map.get('hi', 'Hello! How can I help you today?')),
+    (re.compile(r'^(what is your name\??|who are you\??|tell me about yourself\??)$', re.I), faq_map.get('what is your name?', "I'm Lace, your virtual assistant. How can I help you?")),
+    (re.compile(r'^(how are you\??|how do you do\??|what\'s up\??|status)$', re.I), faq_map.get('how are you?', "I'm just a program, but I'm here to help you!")),
+    (re.compile(r'^(goodbye|bye|farewell)[!. ]*$', re.I), 'Goodbye! It was nice chatting with you.'),
+    (re.compile(r'^(thank you|thanks)[!. ]*$', re.I), "You're welcome! It was my pleasure to assist you."),
+    (re.compile(r'^(wagwan)[!. ]*$', re.I), faq_map.get('wagwan', 'Hello!')),
+]
+
+# In-memory context memory: user_id -> deque of (user, bot) messages
+CONTEXT_WINDOW = 3  # Number of previous exchanges to remember
+user_contexts: Dict[str, deque] = defaultdict(lambda: deque(maxlen=CONTEXT_WINDOW))
+
+# Precompute embeddings for FAQ/casual prompts for semantic intent matching
+faq_questions = list(faq_map.keys())
+faq_embeddings = embedder.encode(faq_questions, convert_to_numpy=True)
+
+
+# Define a function to log prompts and responses in JSONL format (thread-safe)
+def log_data(prompt: str, response: str):
     log_entry = {
         "prompt": prompt,
         "response": response
     }
-    # Ensure the log file exists
     if not os.path.exists('logs'):
         os.makedirs('logs')
-    # Append the log entry to a JSON file
-    with open('logs/collected_data.json', 'a') as log_file:
-        log_file.write(json.dumps(log_entry) + "\n")
-    print("Collected data has been created and logged.")
+    with log_lock:
+        with open('logs/collected_data.json', 'a') as log_file:
+            log_file.write(json.dumps(log_entry) + "\n")
+    logging.info("Collected data has been created and logged.")
 
-# Define chatbot response function
-def chatbot_response(query):
-    # Pre-defined casual responses
-    casual_responses = {
-        "greeting": "Hello! How can I help you today?",
-        "status": "I'm just a program, but I'm here to help you!",
-        "farewell": "Goodbye! It was nice chatting with you.",
-        "thanks": "You're welcome! It was my pleasure to assist you.",
-        "how are you": "I'm just a program, but I'm functioning properly. How can I help you today?"
-    }
-    
-    normalized_query = query.lower().strip()
-    # Use regex to match greetings
-    if re.search(r'\b(hi|hello|hey)\b', normalized_query):
-        response = casual_responses["greeting"]
-    # Use regex to match status inquiry
-    elif re.search(r'\b(how are you|what\'s up|status)\b', normalized_query):
-        response = casual_responses["status"]
-    # Use regex to match farewell
-    elif re.search(r'\b(goodbye|bye|farewell)\b', normalized_query):
-        response = casual_responses["farewell"]
-    # Use regex to match thanks
-    elif re.search(r'\b(thank you|thanks)\b', normalized_query):
-        response = casual_responses["thanks"]
-    # Use regex to match how are you
-    elif re.search(r'\b(how are you|how do you do)\b', normalized_query):
-        response = casual_responses["how are you"]
+def get_user_id() -> str:
+    """Get a user/session ID from the request (for now, use IP as a simple stand-in)."""
+    # For production, use a real session/token/cookie
+    return request.remote_addr or 'default_user'
+
+
+def get_faq_response(query: str) -> Optional[str]:
+    """Return a FAQ/casual response using direct, regex, or semantic match."""
+    normalized = query.strip().lower()
+    # Direct match
+    if normalized in faq_map:
+        return faq_map[normalized]
+    # Regex pattern match
+    for pattern, answer in faq_patterns:
+        if pattern.match(query.strip()):
+            return answer
+    # Embedding similarity match
+    try:
+        query_emb = embedder.encode([normalized], convert_to_numpy=True)
+        scores = np.dot(faq_embeddings, query_emb.T).squeeze()
+        best_idx = int(np.argmax(scores))
+        if scores[best_idx] > 0.8:  # Similarity threshold
+            return faq_map[faq_questions[best_idx]]
+    except Exception as e:
+        logging.error(f"FAQ embedding similarity error: {e}")
+    return None
+
+
+def chatbot_response(query: str, user_id: str) -> str:
+    """Generate a chatbot response, using context and robust intent detection."""
+    # Use context window for this user
+    context_history = user_contexts[user_id]
+    faq_response = get_faq_response(query)
+    if faq_response:
+        response = faq_response
     else:
-        retrieved_docs = retrieve_documents(query, embedder, index)
-        prompt = construct_prompt(query, retrieved_docs)
-        response = generate_response(prompt)
-    
-    # Log the prompt and response
+        try:
+            # Build context for prompt
+            context_lines = []
+            for user_msg, bot_msg in context_history:
+                context_lines.append(f"User: {user_msg}")
+                context_lines.append(f"Assistant: {bot_msg}")
+            # Add current user query
+            context_lines.append(f"User: {query}")
+            context = "\n".join(context_lines)
+            # Retrieve relevant docs
+            retrieved_docs = retrieve_documents(query, embedder, index)
+            doc_context = "\n".join(doc[:300] for doc in retrieved_docs)
+            prompt = f"{doc_context}\n{context}\nAssistant:"
+            response = generate_response(prompt)
+            # Post-process: Remove prompt echo, excessive length, and repeated content
+            response = response.replace(prompt, '').strip()
+            if response.lower().startswith(query.lower()):
+                response = response[len(query):].strip()
+            # Truncate to 2 sentences max
+            response = re.split(r'(?<=[.!?]) +', response)
+            response = ' '.join(response[:2]).strip()
+            if not response:
+                response = "I'm not sure how to answer that, but I'm here to help!"
+        except Exception as e:
+            logging.error(f"Error generating response: {e}")
+            response = "Sorry, I encountered an error. Please try again later."
+    # Update context memory
+    context_history.append((query, response))
     log_data(query, response)
     return response
 
@@ -138,7 +197,8 @@ def home():
 def chat():
     data = request.get_json()
     query = data.get("query", "")
-    response = chatbot_response(query)
+    user_id = get_user_id()
+    response = chatbot_response(query, user_id)
     return jsonify({"response": response})
 
 @app.route("/check_git", methods=["GET"])
@@ -180,38 +240,9 @@ def ensure_git_repo():
         logging.info("Repository already exists. Appending to collected_data.json.")
 
     # Append new interaction to collected_data.json
-    append_to_collected_data()
+    # append_to_collected_data() # This function is no longer needed
 
-def append_to_collected_data():
-    log_entry = {
-        "prompt": "User prompt here",  # Replace with actual user prompt
-        "response": "Model response here"  # Replace with actual model response
-    }
-    
-    # Ensure the log file exists
-    if not os.path.exists('logs'):
-        os.makedirs('logs')
-
-    # Append the log entry to the JSON file
-    log_file_path = 'logs/collected_data.json'
-    if os.path.exists(log_file_path):
-        try:
-            with open(log_file_path, 'r+') as log_file:
-                data = json.load(log_file)
-                data.append(log_entry)  # Append new entry
-                log_file.seek(0)  # Move the cursor to the beginning of the file
-                json.dump(data, log_file, indent=4)  # Write updated data back to the file
-                log_file.truncate()  # Remove any leftover data
-                logging.info("Appended new interaction to collected_data.json.")
-        except json.JSONDecodeError:
-            logging.error("JSONDecodeError: The collected_data.json file is corrupted. Creating a new file.")
-            with open(log_file_path, 'w') as log_file:
-                json.dump([log_entry], log_file, indent=4)  # Create new file with the first entry
-                logging.info("Created collected_data.json and added the first interaction.")
-    else:
-        with open(log_file_path, 'w') as log_file:
-            json.dump([log_entry], log_file, indent=4)  # Create new file with the first entry
-            logging.info("Created collected_data.json and added the first interaction.")
+# Remove append_to_collected_data definition and all its usages
 
 def push_to_github():
     ensure_git_repo()  # Ensure the repo is cloned and set up
