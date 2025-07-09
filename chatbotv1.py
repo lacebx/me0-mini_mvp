@@ -80,12 +80,20 @@ def generate_response(prompt):
     )
     return tokenizer.decode(outputs[0], skip_special_tokens=True)
 
-# Load FAQ/casual responses from cleaned_data.json
-with open('refinement/cleaned_data.json', 'r') as f:
-    cleaned_faqs = json.load(f)
-
-# Build a normalized FAQ map for quick lookup
-faq_map = {q['prompt'].strip().lower(): q['response'] for q in cleaned_faqs}
+# Remove loading of cleaned_faqs and faq_map from cleaned_data.json
+# Instead, use a minimal hardcoded FAQ/casual map if needed, or rely on feedback/fine-tuning
+faq_map = {
+    'hi': 'Hello! How can I help you today?',
+    'what is your name?': "I'm Lace, your virtual assistant. How can I help you?",
+    'who are you?': "I'm Lace, your virtual assistant. How can I help you?",
+    'how are you?': "I'm just a program, but I'm here to help you!",
+    'thanks': "You're welcome! It was my pleasure to assist you.",
+    'thank you': "You're welcome! It was my pleasure to assist you.",
+    'goodbye': 'Goodbye! It was nice chatting with you.',
+    'bye': 'Goodbye! It was nice chatting with you.',
+    'farewell': 'Goodbye! It was nice chatting with you.',
+    'wagwan': 'wagwan bossy',
+}
 
 # Add additional direct FAQ/casual patterns
 faq_patterns = [
