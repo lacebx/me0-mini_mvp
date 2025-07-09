@@ -17,6 +17,7 @@ import logging
 from typing import Optional, Dict, List
 from threading import Lock
 from collections import defaultdict, deque
+import datetime
 
 # Set up logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
@@ -117,6 +118,48 @@ def log_data(prompt: str, response: str):
             log_file.write(json.dumps(log_entry) + "\n")
     logging.info("Collected data has been created and logged.")
 
+# Add flag phrases for detecting user dissatisfaction
+FLAG_PHRASES = [
+    r"i didn't like that",
+    r"that was not helpful",
+    r"bad answer",
+    r"not helpful",
+    r"that was wrong",
+    r"can you do better",
+    r"i don'?t like that",
+    r"that was incorrect",
+    r"that was bad",
+    r"unsatisfactory",
+    r"try again",
+    r"wrong answer",
+    r"no, that's not right",
+    r"no, that's wrong",
+]
+flag_patterns = [re.compile(p, re.I) for p in FLAG_PHRASES]
+
+# Thread lock for bad response logging
+bad_log_lock = Lock()
+
+def log_bad_response(user_id: str, flag_phrase: str):
+    """Log the previous prompt and response for this user as a bad response."""
+    context_history = user_contexts[user_id]
+    if not context_history:
+        return  # Nothing to log
+    prev_prompt, prev_response = context_history[-1]
+    log_entry = {
+        "prompt": prev_prompt,
+        "bad_response": prev_response,
+        "flagged_by": flag_phrase,
+        "user_id": user_id,
+        "timestamp": datetime.datetime.utcnow().isoformat() + 'Z'
+    }
+    if not os.path.exists('logs'):
+        os.makedirs('logs')
+    with bad_log_lock:
+        with open('logs/bad_responses.jsonl', 'a') as log_file:
+            log_file.write(json.dumps(log_entry) + "\n")
+    logging.info(f"Bad response logged for review: {log_entry}")
+
 def get_user_id() -> str:
     """Get a user/session ID from the request (for now, use IP as a simple stand-in)."""
     # For production, use a real session/token/cookie
@@ -146,7 +189,13 @@ def get_faq_response(query: str) -> Optional[str]:
 
 
 def chatbot_response(query: str, user_id: str) -> str:
-    """Generate a chatbot response, using context and robust intent detection."""
+    """Generate a chatbot response, using context and robust intent detection. Also detect and log flagged bad responses."""
+    # Check if the user is flagging a bad response
+    for pattern in flag_patterns:
+        if pattern.search(query):
+            log_bad_response(user_id, query)
+            # Optionally, you can return a special message here, but for now, just continue
+            return "Thank you for your feedback. I'll try to do better next time!"
     # Use context window for this user
     context_history = user_contexts[user_id]
     faq_response = get_faq_response(query)
